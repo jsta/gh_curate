@@ -11,7 +11,7 @@ user_name <- "jsta"
 
 unpack_gh <- function(x, key) {
   n_levels <- length(key)
-  if(n_levels > 1){
+  if (n_levels > 1) {
     as.character(unlist(flatten((tj(x) %>% index()) %>% fj)[key[2]]))
   }else{
     as.character(unlist(((tj(x) %>% index()) %>% fj)[key]))
@@ -22,7 +22,7 @@ latest_gh <- function(user_name){
   print(user_name)
   quantity <- "events"
   res_page <- gh(paste0("/users/:username/", quantity), username = user_name)
-  if(nchar(res_page[[1]]) > 0){
+  if (length(res_page) > 0) {
     res_page[[1]]$created_at
   }else{
     NA
@@ -33,7 +33,7 @@ pull_gh <- function(quantity, user_name, n_pages, key){
   res      <- list()
   res_page <- gh(paste0("/users/:username/", quantity), username = user_name)
   res[[1]] <- res_page
-  for(i in 2:n_pages){
+  for (i in 2:n_pages) {
     tryCatch({
       print(i)
       res_page <- gh_next(res_page)
@@ -75,7 +75,7 @@ paste0(length(test), " following with no stars who are not mutual followers")
 
 # rm users active in the last 90 days
 last_action_date <- lapply(bad_following, latest_gh)
-last_action_date <-  unlist(last_action_date)
+last_action_date <- unlist(last_action_date)
 bad_following    <- bad_following[is.na(last_action_date)]
 
 # rm users in common orgs
@@ -110,7 +110,10 @@ baduser_gh <- function(user_name){
 badusers <- unlist(lapply(bad_following, baduser_gh))
 bad_following <- bad_following[badusers]
 
+# open browser tabs
+sapply(paste0("firefox https://github.com/", bad_following), system)
+
 # make sure your token has unfollow permissions
-sapply(bad_following, function(x) gh(paste0("DELETE /user/following/:username"),
-                                     username = x))
+# sapply(bad_following, function(x) gh(paste0("DELETE /user/following/:username"),
+#                                      username = x))
 
