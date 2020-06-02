@@ -51,3 +51,7 @@ pull_gh <- function(quantity = NA, user_name = NA, n_pages = NA, key,
   }
   res
 }
+
+base_str_extract <- function(x, regex_str){
+  regmatches(x, regexpr(regex_str, x, perl = TRUE))
+}
