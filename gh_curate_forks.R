@@ -4,12 +4,18 @@ library(pkgsearch)
 library(cranlogs)
 
 # protect specific repos
-to_keep <- c("jsta/binb", "jsta/cdlTools", "jsta/lakemorpho")
+to_keep <- c("jsta/binb", "jsta/cdlTools", "jsta/lakemorpho", "jsta/rgrass7sf",
+             "jsta/EML", "jsta/esri2sf", "jsta/laketemps", "jsta/msu-thesis",
+             "jsta/OCNet", "jsta/organization-geospatial", "jsta/pinp",
+             "jsta/r-raster-vector-geospatial", "jsta/ReScience-submission",
+             "jsta/rethinking", "jsta/riverdist", "jsta/rloadest",
+             "jsta/rnoaa", "jsta/smwrQW", "jsta/styles", "jsta/tgp",
+             "jsta/tidybayes", "jsta/vapour", "jsta/workshop-template")
 
 # pull jsta forks
 user_name <- "jsta"
 repos <- pull_gh("repos", user_name,
-                 n_pages = 6,
+                 n_pages = 14,
                  key = c("full_name", "fork"))
 forks <- dplyr::filter(repos, id.fork == TRUE)
 
@@ -74,7 +80,9 @@ forks$to_remove[forks$updated_at > cutoff_date] <- TRUE
 forks$to_remove[forks$id.full_name %in% to_keep] <- FALSE
 
 # DELETE!!!!
-sapply(forks$id.full_name[forks$to_remove],
+res <- list()
+i   <- 1
+res <- sapply(forks$id.full_name[forks$to_remove],
        function(x){
          # x <- forks$id.full_name[forks$to_remove][1]
          approval <- 3
@@ -87,5 +95,13 @@ sapply(forks$id.full_name[forks$to_remove],
             if (approval == 1) {
               gh(paste0("DELETE /repos/:repo"), repo = x)
             }
-          }
+           if (approval == 2) {
+             res[[i]] <- x
+           }
+         }
+         i <- i + 1
         })
+
+clipr::write_clip(names(res))
+
+# datapasta::vector_paste()
